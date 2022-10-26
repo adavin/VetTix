@@ -59,7 +59,7 @@ function loadSelectOptions() {
     }
     for (const state of eventStates.list) {
         const element = document.createElement('option')
-        element.value = state.ID
+        element.value = state.code
         element.text = `(${state.code}) ${state.name}`
         selEventState.appendChild(element)
     }
