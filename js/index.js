@@ -103,7 +103,8 @@ Query Parameter — Status of events to query ("open", "lottery", "fcfs", "all",
     params += `&count=100`
     params += `&stateCode=${selEventState.value}`
 
-    xhr.open("POST", apiBasePath + '/event?' + params, true);
+    xhr.open("GET", apiBasePath + '/event?' + params, true);
+    xhr.setRequestHeader('Authorization', `Bearer ${currentToken()}`)
     xhr.onreadystatechange = () => { 
         if (xhr.readyState === XMLHttpRequest.DONE && [200, 401].indexOf(xhr.status) !== -1) {
             const response = JSON.parse(xhr.responseText)
@@ -116,7 +117,7 @@ Query Parameter — Status of events to query ("open", "lottery", "fcfs", "all",
 function loginClicked() {
     // Get email and api key inputs
     //alert(`Email: ${inputEmail.value} -> API Key: ${inputApiKey.value}`)
-    
+
     // Process actual login request to API
     const xhr = new XMLHttpRequest();
     xhr.open("POST", apiBasePath + '/user/limited/login', true);
@@ -153,7 +154,7 @@ function getSessionClicked() {
         alert(`Not logged in`)
         return
     }
-    //alert(curr)
+    alert(curr)
 }
 
 //Logout
