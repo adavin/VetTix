@@ -5,6 +5,7 @@ const btnLogin = document.getElementById('btn-login')
 //const btnGetSession = document.getElementById('btn-get-session')
 const btnClearSession = document.getElementById('btn-clear-session')
 const btnSearch = document.getElementById('btn-search')
+const btnSearchInventory = document.getElementById('btn-search-inventory')
 
 //Get select elements for search
 const selEventType = document.getElementById('select-event-type')
@@ -15,6 +16,9 @@ const selEventSort = document.getElementById('select-event-sort')
 //Get input elements for login
 const inputEmail = document.getElementById('email')
 const inputApiKey = document.getElementById('apikey')
+//Get input elements for inventory check
+const inputInventoryEventId = document.getElementById('inventory-event-id')
+const inputInventoryTicketsWanted =  document.getElementById('inventory-tickets-wanted')
 
 //Get table element for /event data
 const tblEvents = document.getElementById('table-events')
@@ -25,11 +29,15 @@ btnLogin.addEventListener('click', loginClicked)
 //btnGetSession.addEventListener('click', getSessionClicked)
 btnClearSession.addEventListener('click', clearSessionClicked)
 btnSearch.addEventListener('click', searchClicked)
+btnSearchInventory.addEventListener('click', searchInventoryClicked)
 
 //Functions to execute upon document load
 showHideContainers()
 loadSelectOptions()
 
+/********************************
+ * Begin custom functions/methods
+********************************/
 /**
  * Gets the token for the current session
  * @returns string
@@ -85,20 +93,19 @@ function loadSelectOptions() {
 }
 
 /**
- * 
+ * Parses the event data to table
  * @param {*} eventsResponse 
  */
-
 function parseEventData(eventsResponse) {
     tblEventData.innerHTML = ''
     if (eventsResponse.eventItems === undefined) {
         alert('Error parsing events response')
         return
     }   
-    console.log(eventsResponse, eventsResponse.eventItems)
-    for (var i=0; i<eventsResponse.eventItems.length; i++) {
-        const eventItem = eventsResponse.eventItems[i]
-        console.log(eventItem)
+    //console.log(eventsResponse, eventsResponse.eventItems)
+    for (const eventItem of eventsResponse.eventItems) {
+        //const eventItem = eventsResponse.eventItems[i]
+        //console.log(eventItem)
         const row = tblEventData.insertRow()
         const img = document.createElement("img")
         img.src = eventItem.imageURL
@@ -110,22 +117,98 @@ function parseEventData(eventsResponse) {
         row.insertCell().innerHTML = eventItem.eventType.name
         row.insertCell().innerHTML = eventItem.ticketsAvailable
         row.insertCell().innerHTML = eventItem.startDate
+        row.insertCell().innerHTML = eventItem.startTime
     }
     //tblEventData.insertRow()
 }
+
+/**
+ *  Check inventory data for seat after lookup
+ * @param {*} inventory 
+ */
+function parseInventoryData(inventory, wanted) {
+    const seating = {}
+
+    // convert data into a different format
+    for (const seat of inventory) {
+        if (seating[seat.section] === undefined) seating[seat.section] = {}
+        if (seating[seat.section][seat.row] === undefined) seating[seat.section][seat.row] = []
+        seating[seat.section][seat.row].push(Number(seat.seat))
+    }
+
+    // the fun part
+    for (const section of Object.keys(seating)) {
+        for (const row of Object.keys(seating[section])) {
+            for (const seat of seating[section][row]) {
+                if (seating[section][row].indexOf(seat - 1) !== -1) continue
+                var enoughSeats = true
+                for (let i=0; i<wanted; i++) {
+                    if (seating[section][row].indexOf(seat + i) === -1) {
+                        enoughSeats = false
+                        break
+                    }
+                }
+                if (enoughSeats) {
+                    alert(`We found some tickets for you!\nSection: ${section} \nRow: ${row} \nSeats:${seat}-${seat+wanted-1}`)
+                    return
+                }
+            }
+        }
+    }
+    alert(`Sorry, we were unable to find sufficient seating for your group`)
+    console.log(seating)
+}
+
+/**
+ * Get inventory via /inventory/
+ * @returns 
+ */
+function performInventorySearch() {
+    const inventoryEventId = Number(inputInventoryEventId.value)
+    if (inventoryEventId <= 0) {
+        alert('Please enter an Event ID')
+        inputInventoryEventId.focus()
+        return
+    }
+    const ticketsWanted = Number(inputInventoryTicketsWanted.value)
+    if (ticketsWanted <= 0) {
+        alert('Please enter a number greater than 0')
+        inputInventoryTicketsWanted.focus()
+        return
+    }
+    const xhr = new XMLHttpRequest()
+    xhr.open("GET", `${apiBasePath}/inventory/${inventoryEventId}`, true)
+    xhr.setRequestHeader('Authorization', `Bearer ${currentToken()}`)
+    xhr.onreadystatechange = () => { 
+        if (xhr.readyState === XMLHttpRequest.DONE && [200, 401].indexOf(xhr.status) !== -1) {
+            const response = JSON.parse(xhr.responseText)
+            if (response.errorCode !== undefined) {
+                if (response.errorCode === 'AUTHENTICATION_FAILED') {
+                    clearSessionClicked()
+                    showHideContainers()
+                }
+                alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
+                return
+            }
+            parseInventoryData(response, ticketsWanted)
+        }
+    }
+    xhr.send()
+}
+
 /**
  * Perform the /event search
  * @param Number startNum 
  */
 function performSearch(startNum = 1) {
-    const xhr = new XMLHttpRequest()
+
     var params = `start=${startNum}`
     params += `&count=100`
     params += `&stateCode=${selEventState.value}`
     params += `&eventTypeID=${selEventType.value}`
     params += `&sortBy=${selEventSort.value}`
     params += `&eventStatus=${selEventStatus.value}`
-
+    const xhr = new XMLHttpRequest()
     xhr.open("GET", apiBasePath + '/event?' + params, true)
     xhr.setRequestHeader('Authorization', `Bearer ${currentToken()}`)
     xhr.onreadystatechange = () => { 
@@ -145,17 +228,36 @@ function performSearch(startNum = 1) {
     xhr.send()
 }
 
+/**
+ * Perform logout
+ */
 function performLogout() {
     sessionStorage.removeItem('token')
     showHideContainers()
 }
-/**
+
+
+/*******************************
  * Button click methods
+ *******************************/
+
+/**
+ * Search button clicked
  */
 function searchClicked() {
     performSearch()
 }
 
+/**
+ * Search Inventory button clicked
+ */
+function searchInventoryClicked() {
+    performInventorySearch()
+}
+
+/**
+ * Login button clicked
+ */
 function loginClicked() {
     // Get email and api key inputs
     //alert(`Email: ${inputEmail.value} -> API Key: ${inputApiKey.value}`)
@@ -189,7 +291,10 @@ function loginClicked() {
     xhr.send(formData)
 }
 
-//check session data/token
+/**
+ * Unused
+ * @returns 
+ */
 function getSessionClicked() {
     const curr = currentToken()
     if (curr === null) {
@@ -199,7 +304,9 @@ function getSessionClicked() {
     alert(curr)
 }
 
-//Logout
+/**
+ * Logout button clicked
+ */
 function clearSessionClicked() {
     performLogout()
 }
