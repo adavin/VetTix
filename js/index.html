@@ -33,34 +33,48 @@
   </nav>
   <div class="container" id="container-login">
         <div class="row">
-            <div class="col-md-4 offset-md-4 text-center bg-dark bg-opacity-10 p-5 rounded ">
+            <div class="col-md-4 offset-md-4 text-center bg-dark bg-opacity-10 p-3 rounded ">
                 <h3>Login</h3>
-                <input class="form-control mb-4" type="text" id="email" value="">
-                <input class="form-control mb-4" type="text" id="apikey" value="">
+                <input class="form-control mb-4" type="email" id="email" value="" placeholder="Email">
+                <input class="form-control mb-4" type="text" id="apikey" value="bSgpYBN5iW2UFWDVJ2DTsdwujioSO" placeholder="API Key">
                 <button class="btn btn-primary" id="btn-login">Login</button>
-                <button class="btn btn-primary" id="btn-get-session">Get Session</button>
-                <!--<button class="btn btn-primary" id="btn-clear-session">Clear Session</button>-->
+                <!--<button class="btn btn-primary" id="btn-get-session">Get Session</button>
+                <button class="btn btn-primary" id="btn-clear-session">Clear Session</button>-->
             </div>
         </div>
   </div>
   <div class="container" id="container-data">
     <div class="row">
-        <div class="col-md-6 offset-md-3 text-center bg-dark bg-opacity-10 p-4 rounded mb-4">
+        <div class="col-md-6 offset-md-3 text-center bg-dark bg-opacity-10 p-3 rounded mb-4">
             <h3>Logged in</h3>
             <button class="btn btn-primary" id="btn-clear-session">Clear Session</button>
         </div>
         <div class="col-md-6 offset-md-3 text-center bg-dark bg-opacity-10 p-4 rounded mb-4">
-            <select class="form-select mb-3" aria-label="Event Type" id="select-event-type">
+            <select class="form-select mb-2" aria-label="Event Type" id="select-event-type">
                 <option selected value="0">Any</option>
             </select>
-            <select class="form-select mb-3" aria-label="Event State" id="select-event-state">
-                <option selected value="0">Any</option>
+            <select class="form-select mb-2" aria-label="Event State" id="select-event-state">
+                <option selected value="">Any</option>
             </select>
-            <select class="form-select mb-3" aria-label="Event Status" id="select-event-status">
-            </select>
-            <select class="form-select mb-3" aria-label="Event Sort" id="select-event-sort">
-            </select>
+            <select class="form-select mb-2" aria-label="Event Status" id="select-event-status"></select>
+            <select class="form-select mb-2" aria-label="Event Sort" id="select-event-sort"></select>
             <button class="btn btn-primary form-control" id="btn-search">Search</button>
+        </div>
+        <div class="col-md-12">
+            <table class="table table-dark table-striped table-bordered table-hover" id="table-events">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Image</th>
+                        <th scope="col">Event ID</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Event Type</th>
+                        <th scope="col">Tickets Available</th>
+                        <th scope="col">Start Date</th>
+                    </tr>
+                </thead>
+                <tbody id="table-event-data">
+                </tbody>
+            </table>
         </div>
     </div>
   </div>

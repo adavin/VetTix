@@ -2,7 +2,7 @@ const apiBasePath = 'https://www.vettix.org/uapi'
 
 //Get button elements
 const btnLogin = document.getElementById('btn-login')
-const btnGetSession = document.getElementById('btn-get-session')
+//const btnGetSession = document.getElementById('btn-get-session')
 const btnClearSession = document.getElementById('btn-clear-session')
 const btnSearch = document.getElementById('btn-search')
 
@@ -16,9 +16,13 @@ const selEventSort = document.getElementById('select-event-sort')
 const inputEmail = document.getElementById('email')
 const inputApiKey = document.getElementById('apikey')
 
+//Get table element for /event data
+const tblEvents = document.getElementById('table-events')
+const tblEventData = document.getElementById('table-event-data')  //tbody
+
 //Add event listeners
 btnLogin.addEventListener('click', loginClicked)
-btnGetSession.addEventListener('click', getSessionClicked)
+//btnGetSession.addEventListener('click', getSessionClicked)
 btnClearSession.addEventListener('click', clearSessionClicked)
 btnSearch.addEventListener('click', searchClicked)
 
@@ -50,6 +54,9 @@ function showHideContainers() {
     }
 }
 
+/**
+ * Populate the select dropdowns
+ */
 function loadSelectOptions() {
     for (const event of eventTypes.list) {
         const element = document.createElement('option')
@@ -78,40 +85,75 @@ function loadSelectOptions() {
 }
 
 /**
- * Button click methods
+ * 
+ * @param {*} eventsResponse 
  */
-function searchClicked() {
-    /**
-     * 
-Query parameters
-stateCode (optional)
-Query Parameter — State code - "code" value from /state list
-eventTypeID (optional)
-Query Parameter — ID of specific event type to query ("id" value from /eventtype call)
-sortBy (optional)
-Query Parameter — How the event list should be sorted ("dateAscending", "dateDescending", "ticketsAvailableAscending", "ticketsAvailableDescending", "popularity", "titleAscending", "titleDescending")
-start (required)
-Query Parameter — Starting record number for paging
-count (required)
-Query Parameter — Number of records to retrieve for paging. May be further limited by server. Check response for actual value.
-eventStatus (optional)
-Query Parameter — Status of events to query ("open", "lottery", "fcfs", "all", "preferred"). Defaults to "all" if not specified.
-     */
-    const xhr = new XMLHttpRequest();
-    var params = ''
-    params += `start=1`
+
+function parseEventData(eventsResponse) {
+    tblEventData.innerHTML = ''
+    if (eventsResponse.eventItems === undefined) {
+        alert('Error parsing events response')
+        return
+    }   
+    console.log(eventsResponse, eventsResponse.eventItems)
+    for (var i=0; i<eventsResponse.eventItems.length; i++) {
+        const eventItem = eventsResponse.eventItems[i]
+        console.log(eventItem)
+        const row = tblEventData.insertRow()
+        const img = document.createElement("img")
+        img.src = eventItem.imageURL
+        img.style.maxWidth = '50px'
+        img.style.maxHeight = '50px'
+        row.insertCell().appendChild(img)
+        row.insertCell().innerHTML = eventItem.ID
+        row.insertCell().innerHTML = eventItem.title
+        row.insertCell().innerHTML = eventItem.eventType.name
+        row.insertCell().innerHTML = eventItem.ticketsAvailable
+        row.insertCell().innerHTML = eventItem.startDate
+    }
+    //tblEventData.insertRow()
+}
+/**
+ * Perform the /event search
+ * @param Number startNum 
+ */
+function performSearch(startNum = 1) {
+    const xhr = new XMLHttpRequest()
+    var params = `start=${startNum}`
     params += `&count=100`
     params += `&stateCode=${selEventState.value}`
+    params += `&eventTypeID=${selEventType.value}`
+    params += `&sortBy=${selEventSort.value}`
+    params += `&eventStatus=${selEventStatus.value}`
 
-    xhr.open("GET", apiBasePath + '/event?' + params, true);
+    xhr.open("GET", apiBasePath + '/event?' + params, true)
     xhr.setRequestHeader('Authorization', `Bearer ${currentToken()}`)
     xhr.onreadystatechange = () => { 
         if (xhr.readyState === XMLHttpRequest.DONE && [200, 401].indexOf(xhr.status) !== -1) {
             const response = JSON.parse(xhr.responseText)
-            console.log(response)
+            if (response.errorCode !== undefined) {
+                if (response.errorCode === 'AUTHENTICATION_FAILED') {
+                    clearSessionClicked()
+                    showHideContainers()
+                }
+                alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
+                return
+            }
+            parseEventData(response)
         }
     }
     xhr.send()
+}
+
+function performLogout() {
+    sessionStorage.removeItem('token')
+    showHideContainers()
+}
+/**
+ * Button click methods
+ */
+function searchClicked() {
+    performSearch()
 }
 
 function loginClicked() {
@@ -159,6 +201,5 @@ function getSessionClicked() {
 
 //Logout
 function clearSessionClicked() {
-    sessionStorage.removeItem('token')
-    showHideContainers()
+    performLogout()
 }

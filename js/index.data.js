@@ -237,11 +237,11 @@ const eventSort = [
     },
     {
         name: 'Most Tickets Available',
-        value: 'ticketsAvailableAscending'
+        value: 'ticketsAvailableDescending'
     },
     {
         name: 'Least Tickets Available',
-        value: 'ticketsAvailableDescending'
+        value: 'ticketsAvailableAscending'
     },
     {
         name: 'Most Popular',
