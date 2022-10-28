@@ -7,7 +7,6 @@ if ($VT->current_token() !== NULL) {
 }
 
 //Check if login posted
-$login_output = '';
 if (isset($_POST['email'])) {
     $login_output = $VT->login($_POST['email'], $_POST['apikey']);
 }
@@ -24,7 +23,7 @@ $VT->get_header();
                 <input class="form-control mb-4" type="text" id="apikey" name="apikey" value="bSgpYBN5iW2UFWDVJ2DTsdwujioSO" placeholder="API Key">
                 <button class="btn btn-primary" id="btn-login" type="submit">Login</button>
             </form>
-            <?php if ($login_output !== '') echo $login_output->errorCode; ?>
+            <?php if (isset($login_output)) echo $login_output->errorCode; ?>
         </div>
     </div>
 </div>

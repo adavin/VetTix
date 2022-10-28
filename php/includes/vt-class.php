@@ -45,7 +45,7 @@ class VetTix {
      * 
      * @param [type] $email
      * @param [type] $apikey
-     * @return void
+     * @return object
      */
     function login($email, $apikey) {
         $ch = curl_init();
@@ -89,6 +89,11 @@ class VetTix {
         return require_once('includes/footer.php');
     }
 
+    /**
+     * Retrieve a list of all available event types (eventTypeGet)
+     *
+     * @return object
+     */
     function get_event_types() {
         if ($this->current_token() === NULL) {
             header('Location: login.php');
@@ -100,19 +105,113 @@ class VetTix {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $output = json_decode(curl_exec($ch));
         curl_close ($ch);
+        if (isset($output->errorCode) && $output->errorCode === 'AUTHENTICATION_FAILED') {
+            $this->logout();
+        }
         return $output;
     }
+
+    /**
+     * Retrieves a list of all available states (stateGet)
+     *
+     * @return object
+     */
     function get_states() {
         if ($this->current_token() === NULL) {
             header('Location: login.php');
             die();
         }
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->current_token()]);
         curl_setopt($ch, CURLOPT_URL, API_BASE_PATH.'/state');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $output = json_decode(curl_exec($ch));
         curl_close ($ch);
         return $output;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param [type] $stateCode
+     * @param [type] $eventTypeID
+     * @param [type] $sortBy
+     * @param [type] $eventStatus
+     * @param integer $start
+     * @param integer $count
+     * @return object
+     */
+    function performSearch($stateCode, $eventTypeID, $sortBy, $eventStatus, $start = 1, $count = 100) {
+        if ($this->current_token() === NULL) {
+            header('Location: login.php');
+            die();
+        }
+        $params = [
+            'start' => $start, 
+            'count' => $count, 
+            'stateCode' => $stateCode,
+            'eventTypeID' => $eventTypeID,
+            'sortBy' => $sortBy,
+            'eventStatus' => $eventStatus
+        ];
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->current_token()]);
+        curl_setopt($ch, CURLOPT_URL, API_BASE_PATH.'/event?'.http_build_query($params));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $output = json_decode(curl_exec($ch));
+        curl_close ($ch);
+        if (isset($output->errorCode) && $output->errorCode === 'AUTHENTICATION_FAILED') {
+            $this->logout();
+        }
+        return $output;
+    }
+
+
+    /**
+     * Undocumented function
+     *
+     * @param [type] $stateCode
+     * @param [type] $eventTypeID
+     * @param [type] $sortBy
+     * @param [type] $eventStatus
+     * @param integer $start
+     * @param integer $count
+     * @return string
+     */
+    function performInventorySearch($eventID, $ticketCount = 4) {
+        if ($this->current_token() === NULL) {
+            header('Location: login.php');
+            die();
+        }
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->current_token()]);
+        curl_setopt($ch, CURLOPT_URL, API_BASE_PATH.'/inventory/'.$eventID);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $output = json_decode(curl_exec($ch));
+        curl_close ($ch);
+        if (isset($output->errorCode) && $output->errorCode === 'AUTHENTICATION_FAILED') {
+            $this->logout();
+        }
+        
+        $seating = [];
+        //this is much cleaner in PHP than JS ;)
+        foreach ($output as $seat) $seating[$seat->section][$seat->row][] = intval($seat->seat); 
+        
+        foreach (array_keys($seating) as $section) {
+            foreach (array_keys($seating[$section]) as $row) {
+                foreach ($seating[$section][$row] as $seat) {
+                    if (in_array($seat - 1, $seating[$section][$row]))  continue;  
+                    $enoughSeats = TRUE;
+                    for ($i=0; $i<$ticketCount; $i++){
+                        if (!in_array($seat + $i, $seating[$section][$row])) {
+                            $enoughSeats = FALSE;
+                        }
+                    }
+                    if ($enoughSeats) {
+                        return "We found some tickets for you!\nSection: $section \nRow: ${row} \nSeats: $seat-".($seat+$ticketCount-1);
+                    }
+                }
+            }
+        }
+        return 'Sorry, we were unable to find sufficient seating for your group';
     }
 }

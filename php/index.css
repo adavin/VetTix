@@ -57,3 +57,7 @@ body {
     -webkit-overflow-scrolling: touch;
   }
 
+.img-thumb {
+  max-width: 50px;
+  max-height: 50px;
+}
