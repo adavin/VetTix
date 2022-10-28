@@ -21,7 +21,6 @@ if (isset($_POST['action'])) {
 $event_types = $VT->get_event_types();
 $states = $VT->get_states();
 
-if (isset($_POST))
 // Start content
 $VT->get_header();
 ?>
