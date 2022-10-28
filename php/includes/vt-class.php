@@ -21,7 +21,7 @@ class VetTix {
 
     /**
      * Return Bearer token from stored session
-     * @return string or NULL
+     * @return string|void
      */
     function current_token() { 
         return isset($_SESSION['token']) ? $_SESSION['token'] : NULL;
@@ -32,7 +32,7 @@ class VetTix {
      *
      * @return void
      */
-    function forceLogin() {
+    function force_login() {
         if ($this->current_token() === NULL) {
             header('Location: login.php');
             die();
@@ -140,7 +140,7 @@ class VetTix {
      * @param integer $count
      * @return object
      */
-    function performSearch($stateCode, $eventTypeID, $sortBy, $eventStatus, $start = 1, $count = 100) {
+    function perform_search($stateCode, $eventTypeID, $sortBy, $eventStatus, $start = 1, $count = 100) {
         if ($this->current_token() === NULL) {
             header('Location: login.php');
             die();
@@ -177,7 +177,7 @@ class VetTix {
      * @param integer $count
      * @return string
      */
-    function performInventorySearch($eventID, $ticketCount = 4) {
+    function perform_inventory_search($eventID, $ticketCount = 4) {
         if ($this->current_token() === NULL) {
             header('Location: login.php');
             die();

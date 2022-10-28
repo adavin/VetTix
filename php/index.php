@@ -1,17 +1,17 @@
 <?php 
 require_once('includes/vt-class.php');
 $VT = new VetTix();
-$VT->forceLogin();
+$VT->force_login();
 if (isset($_POST['action'])) {
     switch ($_POST['action']) {
         case 'logout':
             $VT->logout();
             break;
         case 'search':
-            $event_data = $VT->performSearch($_POST['stateCode'], $_POST['eventTypeID'], $_POST['sortBy'], $_POST['eventStatus']);
+            $event_data = $VT->perform_search($_POST['stateCode'], $_POST['eventTypeID'], $_POST['sortBy'], $_POST['eventStatus']);
             break;
         case 'search_inventory':
-            $inventory_response = $VT->performInventorySearch($_POST['eventID'], $_POST['ticketCount']);
+            $inventory_response = $VT->perform_inventory_search($_POST['eventID'], $_POST['ticketCount']);
             break;
         default:
             die('Unknown action: '.$_POST['action']);
