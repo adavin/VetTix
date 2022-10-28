@@ -33,7 +33,8 @@ btnSearchInventory.addEventListener('click', searchInventoryClicked)
 
 //Functions to execute upon document load
 showHideContainers()
-loadSelectOptions()
+loadEventTypes()
+loadStates()
 
 /********************************
  * Begin custom functions/methods
@@ -65,6 +66,57 @@ function showHideContainers() {
 /**
  * Populate the select dropdowns
  */
+function loadEventTypes() {
+    if (selEventType.children.length !== 1 || currentToken() === null) 
+        return false
+    const xhr = new XMLHttpRequest()
+    xhr.open("GET", apiBasePath + '/event-type', true)
+    xhr.setRequestHeader('Authorization', `Bearer ${currentToken()}`)
+    xhr.onreadystatechange = () => { 
+        if (xhr.readyState === XMLHttpRequest.DONE && [200, 401].indexOf(xhr.status) !== -1) {
+            const response = JSON.parse(xhr.responseText)
+            if (response.errorCode !== undefined) {
+                if (response.errorCode === 'AUTHENTICATION_FAILED') {
+                    clearSessionClicked()
+                    showHideContainers()
+                }
+                alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
+                return
+            }
+            for (const event of response.list) {
+                const element = document.createElement('option')
+                element.value = event.ID
+                element.text = event.name
+                selEventType.appendChild(element)
+            }
+        }
+    }
+    xhr.send()
+}
+
+function loadStates() {
+    if (selEventState.children.length !== 1) 
+        return false
+    const xhr = new XMLHttpRequest()
+    xhr.open("GET", apiBasePath + '/state', true)
+    xhr.onreadystatechange = () => { 
+        if (xhr.readyState === XMLHttpRequest.DONE && [200, 401].indexOf(xhr.status) !== -1) {
+            const response = JSON.parse(xhr.responseText)
+            if (response.errorCode !== undefined) {
+                alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
+                return
+            }
+            for (const state of response.list) {
+                const element = document.createElement('option')
+                element.value = state.code
+                element.text = `(${state.code}) ${state.name}`
+                selEventState.appendChild(element)
+            }
+        }
+    }
+    xhr.send()
+}
+/*
 function loadSelectOptions() {
     for (const event of eventTypes.list) {
         const element = document.createElement('option')
@@ -91,7 +143,7 @@ function loadSelectOptions() {
         selEventSort.appendChild(element) 
     }
 }
-
+*/
 /**
  * Parses the event data to table
  * @param {*} eventsResponse 
@@ -236,6 +288,40 @@ function performLogout() {
     showHideContainers()
 }
 
+/**
+ * Log a user in
+ */
+function performLogin() {
+    // Process actual login request to API
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", apiBasePath + '/user/limited/login', true);
+    xhr.onreadystatechange = () => { 
+      if (xhr.readyState === XMLHttpRequest.DONE && [200, 401].indexOf(xhr.status) !== -1) {
+        const response = JSON.parse(xhr.responseText)
+
+        //Check response is valid and token isn't empty
+        if (response.errorCode !== undefined) {
+            alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
+            return
+        } 
+        if (response.token === undefined || response.token === '') {
+            alert('Error: token not found!')
+            return
+        }
+        //Store token to session
+        sessionStorage.setItem('token', response.token)
+        showHideContainers()
+        loadEventTypes()
+      }
+    }
+
+    //Process XHR request
+    const formData = new FormData()
+    formData.append('email', inputEmail.value)
+    formData.append('password', inputApiKey.value)
+    xhr.send(formData)
+
+}
 
 /*******************************
  * Button click methods
@@ -261,34 +347,7 @@ function searchInventoryClicked() {
 function loginClicked() {
     // Get email and api key inputs
     //alert(`Email: ${inputEmail.value} -> API Key: ${inputApiKey.value}`)
-
-    // Process actual login request to API
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", apiBasePath + '/user/limited/login', true);
-    xhr.onreadystatechange = () => { 
-      if (xhr.readyState === XMLHttpRequest.DONE && [200, 401].indexOf(xhr.status) !== -1) {
-        const response = JSON.parse(xhr.responseText)
-
-        //Check response is valid and token isn't empty
-        if (response.errorCode !== undefined) {
-            alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
-            return
-        } 
-        if (response.token === undefined || response.token === '') {
-            alert('Error: token not found!')
-            return
-        }
-        //Store token to session
-        sessionStorage.setItem('token', response.token)
-        showHideContainers()
-      }
-    }
-
-    //Process XHR request
-    const formData = new FormData()
-    formData.append('email', inputEmail.value)
-    formData.append('password', inputApiKey.value)
-    xhr.send(formData)
+    performLogin()
 }
 
 /**

@@ -53,8 +53,21 @@
                 <select class="form-select mb-2" aria-label="Event State" id="select-event-state">
                     <option selected value="">Any</option>
                 </select>
-                <select class="form-select mb-2" aria-label="Event Status" id="select-event-status"></select>
-                <select class="form-select mb-2" aria-label="Event Sort" id="select-event-sort"></select>
+                <select class="form-select mb-2" aria-label="Event Status" id="select-event-status">
+                  <option value="all">All Events</option>
+                  <option value="open">Open Events</option>
+                  <option value="lottery">Events in Lottery</option>
+                  <option value="fcfs">First Come – First Serve</option>
+                </select>
+                <select class="form-select mb-2" aria-label="Event Sort" id="select-event-sort">
+                  <option value="dateAscending">Event Date (Soonest)</option>
+                  <option value="dateDescending">Event Date (Farthest)</option>
+                  <option value="ticketsAvailableDescending">Most Tickets Available</option>
+                  <option value="ticketsAvailableAscending">Least Tickets Available</option>
+                  <option value="popularity">Most Popular</option>
+                  <option value="titleAscending">Event Title (A-Z)</option>
+                  <option value="titleDescending">Event Title (Z-A)</option>
+                </select>
                 <button class="btn btn-primary form-control" id="btn-search">Search</button>
             </div>
         </div>
