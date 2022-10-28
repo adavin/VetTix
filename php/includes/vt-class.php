@@ -4,8 +4,6 @@ if (count(get_included_files()) === 1) {
     die('Access denied.');
 } 
 
-define('API_BASE_PATH', 'https://www.vettix.org/uapi');
-
 /**
  * VetTix.org
  */
@@ -18,6 +16,7 @@ class VetTix {
      */
     function __construct() {
         session_start();
+        define('API_BASE_PATH', 'https://www.vettix.org/uapi');
     }
 
     /**
@@ -88,5 +87,32 @@ class VetTix {
      */
     function get_footer() {
         return require_once('includes/footer.php');
+    }
+
+    function get_event_types() {
+        if ($this->current_token() === NULL) {
+            header('Location: login.php');
+            die();
+        }
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->current_token()]);
+        curl_setopt($ch, CURLOPT_URL, API_BASE_PATH.'/event-type');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $output = json_decode(curl_exec($ch));
+        curl_close ($ch);
+        return $output;
+    }
+    function get_states() {
+        if ($this->current_token() === NULL) {
+            header('Location: login.php');
+            die();
+        }
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->current_token()]);
+        curl_setopt($ch, CURLOPT_URL, API_BASE_PATH.'/state');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $output = json_decode(curl_exec($ch));
+        curl_close ($ch);
+        return $output;
     }
 }

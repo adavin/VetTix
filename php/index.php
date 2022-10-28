@@ -6,12 +6,14 @@ if (isset($_POST['action'])) {
     switch ($_POST['action']) {
         case 'logout':
             $VT->logout();
-            die('done');
             break;
         default:
             die('Unknown action: '.$_POST['action']);
     }
 }
+
+$VT->get_event_types();
+
 // Start content
 $VT->get_header();
 ?>
@@ -30,12 +32,37 @@ $VT->get_header();
             <div class="text-center bg-dark bg-opacity-10 p-3 rounded mb-4">
                 <select class="form-select mb-2" aria-label="Event Type" id="select-event-type">
                     <option selected value="0">Any</option>
+<?php 
+    $event_types = $VT->get_event_types();
+    foreach($event_types->list as $event_type) {
+        echo '                    <option value="'.htmlspecialchars($event_type->ID).'">'.htmlspecialchars($event_type->name)."</option>\n";
+    }
+?>
                 </select>
                 <select class="form-select mb-2" aria-label="Event State" id="select-event-state">
                     <option selected value="">Any</option>
+<?php 
+    $states = $VT->get_states();
+    foreach($states->list as $state) {
+        echo '                    <option value="'.htmlspecialchars($state->code).'">('.htmlspecialchars($state->code).') '.htmlspecialchars($state->name)."</option>\n";
+    }
+?>
                 </select>
-                <select class="form-select mb-2" aria-label="Event Status" id="select-event-status"></select>
-                <select class="form-select mb-2" aria-label="Event Sort" id="select-event-sort"></select>
+                <select class="form-select mb-2" aria-label="Event Status" id="select-event-status">
+                    <option value="all">All Events</option>
+                    <option value="open">Open Events</option>
+                    <option value="lottery">Events in Lottery</option>
+                    <option value="fcfs">First Come – First Serve</option>
+                </select>
+                <select class="form-select mb-2" aria-label="Event Sort" id="select-event-sort">
+                    <option value="dateAscending">Event Date (Soonest)</option>
+                    <option value="dateDescending">Event Date (Farthest)</option>
+                    <option value="ticketsAvailableDescending">Most Tickets Available</option>
+                    <option value="ticketsAvailableAscending">Least Tickets Available</option>
+                    <option value="popularity">Most Popular</option>
+                    <option value="titleAscending">Event Title (A-Z)</option>
+                    <option value="titleDescending">Event Title (Z-A)</option>
+                </select>
                 <button class="btn btn-primary form-control" id="btn-search">Search</button>
             </div>
         </div>
