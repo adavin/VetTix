@@ -122,7 +122,7 @@ function parseEventData(eventsResponse) {
     //tblEventData.insertRow()
 }
 
-/**
+/** 
  *  Check inventory data for seat after lookup
  * @param {*} inventory 
  */
@@ -149,14 +149,14 @@ function parseInventoryData(inventory, wanted) {
                     }
                 }
                 if (enoughSeats) {
-                    alert(`We found some tickets for you!\nSection: ${section} \nRow: ${row} \nSeats:${seat}-${seat+wanted-1}`)
+                    alert(`We found some tickets for you!\nSection: ${section} \nRow: ${row} \nSeats: ${seat}-${seat+wanted-1}`)
                     return
                 }
             }
         }
     }
     alert(`Sorry, we were unable to find sufficient seating for your group`)
-    console.log(seating)
+    //console.log(seating)
 }
 
 /**
