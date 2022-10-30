@@ -38,6 +38,7 @@ class VetTix {
             die();
         } 
     }
+    
     /**
      * Login using email & API key
      * Store Bearer token to $_SESSION
@@ -130,12 +131,12 @@ class VetTix {
     }
 
     /**
-     * Undocumented function
+     * Search /event API
      *
-     * @param [type] $stateCode
-     * @param [type] $eventTypeID
-     * @param [type] $sortBy
-     * @param [type] $eventStatus
+     * @param string $stateCode
+     * @param string|integer $eventTypeID
+     * @param string $sortBy
+     * @param string $eventStatus
      * @param integer $start
      * @param integer $count
      * @return object
@@ -167,14 +168,10 @@ class VetTix {
 
 
     /**
-     * Undocumented function
+     * Check inventory for $ticketCount amount of seats
      *
-     * @param [type] $stateCode
-     * @param [type] $eventTypeID
-     * @param [type] $sortBy
-     * @param [type] $eventStatus
-     * @param integer $start
-     * @param integer $count
+     * @param string|integer $eventID
+     * @param string|integer $ticketCount
      * @return string
      */
     function perform_inventory_search($eventID, $ticketCount = 4) {

@@ -2,31 +2,26 @@ const apiBasePath = 'https://www.vettix.org/uapi'
 
 //Get button elements
 const btnLogin = document.getElementById('btn-login')
-//const btnGetSession = document.getElementById('btn-get-session')
 const btnClearSession = document.getElementById('btn-clear-session')
 const btnSearch = document.getElementById('btn-search')
 const btnSearchInventory = document.getElementById('btn-search-inventory')
-
 //Get select elements for search
 const selEventType = document.getElementById('select-event-type')
 const selEventState = document.getElementById('select-event-state')
 const selEventStatus = document.getElementById('select-event-status')
 const selEventSort = document.getElementById('select-event-sort')
-
 //Get input elements for login
 const inputEmail = document.getElementById('email')
 const inputApiKey = document.getElementById('apikey')
 //Get input elements for inventory check
 const inputInventoryEventId = document.getElementById('inventory-event-id')
 const inputInventoryTicketsWanted =  document.getElementById('inventory-tickets-wanted')
-
 //Get table element for /event data
 const tblEvents = document.getElementById('table-events')
 const tblEventData = document.getElementById('table-event-data')  //tbody
 
 //Add event listeners
 btnLogin.addEventListener('click', loginClicked)
-//btnGetSession.addEventListener('click', getSessionClicked)
 btnClearSession.addEventListener('click', clearSessionClicked)
 btnSearch.addEventListener('click', searchClicked)
 btnSearchInventory.addEventListener('click', searchInventoryClicked)
@@ -94,6 +89,10 @@ function loadEventTypes() {
     xhr.send()
 }
 
+/**
+ * Load state dropdown
+ * @returns
+ */
 function loadStates() {
     if (selEventState.children.length !== 1) 
         return false
@@ -116,34 +115,7 @@ function loadStates() {
     }
     xhr.send()
 }
-/*
-function loadSelectOptions() {
-    for (const event of eventTypes.list) {
-        const element = document.createElement('option')
-        element.value = event.ID
-        element.text = event.name
-        selEventType.appendChild(element)
-    }
-    for (const state of eventStates.list) {
-        const element = document.createElement('option')
-        element.value = state.code
-        element.text = `(${state.code}) ${state.name}`
-        selEventState.appendChild(element)
-    }
-    for (const status of eventStatus) {
-        const element = document.createElement('option')
-        element.value = status.value
-        element.text = status.name
-        selEventStatus.appendChild(element)
-    }
-    for (const searchSort of eventSort) {
-        const element = document.createElement('option')
-        element.value = searchSort.value
-        element.text = searchSort.name
-        selEventSort.appendChild(element) 
-    }
-}
-*/
+
 /**
  * Parses the event data to table
  * @param {*} eventsResponse 
@@ -156,8 +128,6 @@ function parseEventData(eventsResponse) {
     }   
     //console.log(eventsResponse, eventsResponse.eventItems)
     for (const eventItem of eventsResponse.eventItems) {
-        //const eventItem = eventsResponse.eventItems[i]
-        //console.log(eventItem)
         const row = tblEventData.insertRow()
         const img = document.createElement("img")
         img.src = eventItem.imageURL
@@ -171,7 +141,6 @@ function parseEventData(eventsResponse) {
         row.insertCell().innerHTML = eventItem.startDate
         row.insertCell().innerHTML = eventItem.startTime
     }
-    //tblEventData.insertRow()
 }
 
 /** 
@@ -252,16 +221,16 @@ function performInventorySearch() {
  * Perform the /event search
  * @param Number startNum 
  */
-function performSearch(startNum = 1) {
-
-    var params = `start=${startNum}`
-    params += `&count=100`
-    params += `&stateCode=${selEventState.value}`
-    params += `&eventTypeID=${selEventType.value}`
-    params += `&sortBy=${selEventSort.value}`
-    params += `&eventStatus=${selEventStatus.value}`
+function performSearch(startNum = 1, count=100) {
+    var params = new URLSearchParams({'start': startNum,
+    'count': count,
+    'stateCode': selEventState.value,
+    'eventTypeID': selEventType.value,
+    'sortBy': selEventSort.value,
+    'eventStatus': selEventStatus.value
+    })
     const xhr = new XMLHttpRequest()
-    xhr.open("GET", apiBasePath + '/event?' + params, true)
+    xhr.open("GET", apiBasePath + '/event?' + params.toString(), true)
     xhr.setRequestHeader('Authorization', `Bearer ${currentToken()}`)
     xhr.onreadystatechange = () => { 
         if (xhr.readyState === XMLHttpRequest.DONE && [200, 401].indexOf(xhr.status) !== -1) {
@@ -345,22 +314,7 @@ function searchInventoryClicked() {
  * Login button clicked
  */
 function loginClicked() {
-    // Get email and api key inputs
-    //alert(`Email: ${inputEmail.value} -> API Key: ${inputApiKey.value}`)
     performLogin()
-}
-
-/**
- * Unused
- * @returns 
- */
-function getSessionClicked() {
-    const curr = currentToken()
-    if (curr === null) {
-        alert(`Not logged in`)
-        return
-    }
-    alert(curr)
 }
 
 /**
