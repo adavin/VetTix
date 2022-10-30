@@ -20,7 +20,7 @@ $VT->get_header();
             <h3>Login</h3>
             <form action="login.php" method="POST"> 
                 <input class="form-control mb-4" type="email" id="email" name="email" value="" placeholder="Email">
-                <input class="form-control mb-4" type="text" id="apikey" name="apikey" value="bSgpYBN5iW2UFWDVJ2DTsdwujioSO" placeholder="API Key">
+                <input class="form-control mb-4" type="text" id="apikey" name="apikey" value="" placeholder="API Key">
                 <button class="btn btn-primary" id="btn-login" type="submit">Login</button>
             </form>
             <?php if (isset($login_output)) echo $login_output->errorCode; ?>
