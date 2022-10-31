@@ -44,8 +44,8 @@ class VetTix {
      * Store Bearer token to $_SESSION
      * Redirect
      * 
-     * @param [type] $email
-     * @param [type] $apikey
+     * @param string $email
+     * @param string $apikey
      * @return object
      */
     function login($email, $apikey) {
@@ -75,7 +75,7 @@ class VetTix {
     }
 
     /**
-     * return header.php
+     * header.php
      * @return void
      */
     function get_header() {
@@ -83,7 +83,7 @@ class VetTix {
     }
 
     /**
-     * return footer.php
+     * footer.php
      * @return void
      */
     function get_footer() {
@@ -96,10 +96,7 @@ class VetTix {
      * @return object
      */
     function get_event_types() {
-        if ($this->current_token() === NULL) {
-            header('Location: login.php');
-            die();
-        }
+        $this->force_login();
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->current_token()]);
         curl_setopt($ch, CURLOPT_URL, API_BASE_PATH.'/event-type');
@@ -118,10 +115,7 @@ class VetTix {
      * @return object
      */
     function get_states() {
-        if ($this->current_token() === NULL) {
-            header('Location: login.php');
-            die();
-        }
+        $this->force_login();
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, API_BASE_PATH.'/state');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -142,10 +136,7 @@ class VetTix {
      * @return object
      */
     function perform_search($stateCode, $eventTypeID, $sortBy, $eventStatus, $start = 1, $count = 100) {
-        if ($this->current_token() === NULL) {
-            header('Location: login.php');
-            die();
-        }
+        $this->force_login();
         $params = [
             'start' => $start, 
             'count' => $count, 
@@ -175,10 +166,7 @@ class VetTix {
      * @return string
      */
     function perform_inventory_search($eventID, $ticketCount = 4) {
-        if ($this->current_token() === NULL) {
-            header('Location: login.php');
-            die();
-        }
+        $this->force_login();
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->current_token()]);
         curl_setopt($ch, CURLOPT_URL, API_BASE_PATH.'/inventory/'.$eventID);

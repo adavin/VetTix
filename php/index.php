@@ -81,7 +81,7 @@ $VT->get_header();
                     <span>Event ID</span>
                     <input id="inventory-event-id" class="form-control mb-2" type="number" placeholder="Event ID" name="eventID">
                     <span>How many tickets?</span>
-                    <input id="inventory-tickets-wanted" class="form-control mb-2" type="number" placeholder="Ticket count" name="ticketCount">
+                    <input id="inventory-tickets-wanted" class="form-control mb-2" type="number" placeholder="Ticket count" name="ticketCount" min="1" max="10">
                     <button class="btn btn-primary form-control" id="btn-search-inventory" type="submit">Search Inventory</button>
                 </form>
 

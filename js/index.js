@@ -14,7 +14,7 @@ const selEventSort = document.getElementById('select-event-sort')
 const inputEmail = document.getElementById('email')
 const inputApiKey = document.getElementById('apikey')
 //Get input elements for inventory check
-const inputInventoryEventId = document.getElementById('inventory-event-id')
+const selInventoryEventId = document.getElementById('sel-inventory-event-id')
 const inputInventoryTicketsWanted =  document.getElementById('inventory-tickets-wanted')
 //Get table element for /event data
 const tblEvents = document.getElementById('table-events')
@@ -122,12 +122,13 @@ function loadStates() {
  */
 function parseEventData(eventsResponse) {
     tblEventData.innerHTML = ''
+    selInventoryEventId.innerHTML = ''
     if (eventsResponse.eventItems === undefined) {
         alert('Error parsing events response')
         return
     }   
-    //console.log(eventsResponse, eventsResponse.eventItems)
     for (const eventItem of eventsResponse.eventItems) {
+        //populate table -> event data
         const row = tblEventData.insertRow()
         const img = document.createElement("img")
         img.src = eventItem.imageURL
@@ -140,6 +141,12 @@ function parseEventData(eventsResponse) {
         row.insertCell().innerHTML = eventItem.ticketsAvailable
         row.insertCell().innerHTML = eventItem.startDate
         row.insertCell().innerHTML = eventItem.startTime
+
+        //populate select -> inventory search -> event ids
+        const element = document.createElement('option')
+        element.value = eventItem.ID
+        element.text = `(${eventItem.ID}) ${eventItem.title}`.replace('&#039;', "'")
+        selInventoryEventId.appendChild(element)
     }
 }
 
@@ -185,10 +192,10 @@ function parseInventoryData(inventory, wanted) {
  * @returns 
  */
 function performInventorySearch() {
-    const inventoryEventId = Number(inputInventoryEventId.value)
+    const inventoryEventId = Number(selInventoryEventId.value)
     if (inventoryEventId <= 0) {
         alert('Please enter an Event ID')
-        inputInventoryEventId.focus()
+        selInventoryEventId.focus()
         return
     }
     const ticketsWanted = Number(inputInventoryTicketsWanted.value)
