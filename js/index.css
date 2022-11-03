@@ -57,3 +57,6 @@ body {
     -webkit-overflow-scrolling: touch;
   }
 
+#container-login, #container-data {
+  display: none;
+}
