@@ -1,4 +1,7 @@
 class VetTix {
+    /********************************************************
+     * Initialization
+     *******************************************************/
     constructor() {
         this.apiBasePath = 'https://www.vettix.org/uapi'
 
@@ -11,6 +14,7 @@ class VetTix {
         //Get input elements for inventory check
         this.selInventoryEventId = $('#sel-inventory-event-id')
         this.inputInventoryTicketsWanted = $('#inventory-tickets-wanted')
+
         //Get table element for /event data
         this.tblEvents = $('#table-events')
         this.tblEventData = $('#table-event-data')  //tbody
@@ -30,17 +34,17 @@ class VetTix {
     /********************************
      * Begin custom functions/methods
     ********************************/
-    /**
+    /********************************************************
      * Gets the token for the current session
      * @returns string
-     */
+     *******************************************************/
     currentToken() {
         return sessionStorage.getItem('token')
     }
 
-    /**
+    /********************************************************
      * Shows & Hides the login and tables for logged in data
-     */
+     *******************************************************/
     showHideContainers() {
         const containerIds = ['container-login', 'container-data']
         for (const container of containerIds) {
@@ -53,10 +57,14 @@ class VetTix {
         }
     }
 
-    /**
+    /********************************************************
      * Populate the select dropdowns
-     */
+     *******************************************************/
     loadEventTypes() {
+/******************************************************
+* Note: we use VT = this to reference the VetTix object
+* from nested jQuery calls like .ajax/.post/.get 
+******************************************************/
         const VT = this
         if (VT.selEventType.length !== 1 || VT.currentToken() === null) 
             return false
@@ -79,10 +87,10 @@ class VetTix {
 
     }
 
-    /**
+    /********************************************************
      * Load state dropdown
      * @returns
-     */
+     *******************************************************/
     loadStates() {
         const VT = this
         if (VT.selEventState.length !== 1) 
@@ -103,14 +111,13 @@ class VetTix {
         })
     }
 
-    /**
+    /********************************************************
      * Parses the event data to table
      * @param {*} eventsResponse 
-     */
+     *******************************************************/
     parseEventData(eventsResponse) {
-        const VT = this
-        VT.tblEventData.empty()
-        VT.selInventoryEventId.empty()
+        this.tblEventData.empty()
+        this.selInventoryEventId.empty()
         if (eventsResponse.eventItems === undefined) {
             alert('Error parsing events response')
             return
@@ -122,7 +129,7 @@ class VetTix {
             img.css('max-height', '50px')
 
             const row = $('<tr>')
-            VT.tblEventData.append(row)
+            this.tblEventData.append(row)
             $(row).append($('<td>').append(img))
             .append($('<td>').append(eventItem.ID))
             .append($('<td>').append(eventItem.title))
@@ -135,14 +142,14 @@ class VetTix {
             const element = $('<option>')
             element.val(eventItem.ID)
             element.text(`(${eventItem.ID}) ${eventItem.title}`.replace('&#039;', "'"))
-            VT.selInventoryEventId.append(element)
+            this.selInventoryEventId.append(element)
         }
     }
 
-    /** 
+    /********************************************************
      *  Check inventory data for seat after lookup
      * @param {*} inventory 
-     */
+     *******************************************************/
     parseInventoryData(inventory, wanted) {
         const seating = {}
         // convert data into a different format
@@ -174,10 +181,10 @@ class VetTix {
         alert(`Sorry, we were unable to find sufficient seating for your group`)
     }
 
-    /**
+    /********************************************************
      * Get inventory via /inventory/
      * @returns 
-     */
+     *******************************************************/
     performInventorySearch() {
         const VT = this
         //Validate inputs
@@ -208,10 +215,10 @@ class VetTix {
         })
     }
 
-    /**
+    /********************************************************
      * Perform the /event search
      * @param Number startNum 
-     */
+     *******************************************************/
     performSearch(startNum = 1, count=100) {
         const VT = this
         $.ajax({
@@ -236,9 +243,9 @@ class VetTix {
         return
     }
 
-    /**
+    /********************************************************
      * Log a user in
-     */
+     *******************************************************/
     performLogin() {
         const VT = this
         $.post(VT.apiBasePath + '/user/limited/login', { email: $('#email').val(), password: $('#apikey').val() })
@@ -260,18 +267,18 @@ class VetTix {
         return
     }
 
-    /**
+    /********************************************************
      * Perform logout
-     */
+     *******************************************************/
     performLogout() {
         sessionStorage.removeItem('token')
         this.showHideContainers()
     }
 
-    /**
+    /********************************************************
      * Common error handling for responses
      * @param {}} response 
-     */
+     *******************************************************/
     checkAuthFailed(response) {
         if (response.errorCode !== undefined) {
             if (response.errorCode === 'AUTHENTICATION_FAILED') {
@@ -281,10 +288,11 @@ class VetTix {
             alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
         }
     }
-
 }
 
-//Initialize new Class object
+/*******************************************************
+Initialize new Class object
+*******************************************************/
 const VT = new VetTix()
 
 
