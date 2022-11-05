@@ -178,7 +178,7 @@ class VetTix {
         }
         
         $seating = [];
-        //this is much cleaner in PHP than JS ;)
+
         foreach ($output as $seat) $seating[$seat->section][$seat->row][] = intval($seat->seat); 
         
         foreach (array_keys($seating) as $section) {

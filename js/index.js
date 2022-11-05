@@ -73,7 +73,7 @@ class VetTix {
                 const response = JSON.parse(xhr.responseText)
                 if (response.errorCode !== undefined) {
                     if (response.errorCode === 'AUTHENTICATION_FAILED') {
-                        this.clearSessionClicked()
+                        this.performLogout()
                         this.showHideContainers()
                     }
                     alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
@@ -213,7 +213,7 @@ class VetTix {
                 const response = JSON.parse(xhr.responseText)
                 if (response.errorCode !== undefined) {
                     if (response.errorCode === 'AUTHENTICATION_FAILED') {
-                        this.clearSessionClicked()
+                        this.performLogout()
                         this.showHideContainers()
                     }
                     alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
@@ -245,7 +245,7 @@ class VetTix {
                 const response = JSON.parse(xhr.responseText)
                 if (response.errorCode !== undefined) {
                     if (response.errorCode === 'AUTHENTICATION_FAILED') {
-                        this.clearSessionClicked()
+                        this.performLogout()
                         this.showHideContainers()
                     }
                     alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
