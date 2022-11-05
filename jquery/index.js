@@ -108,8 +108,7 @@ class VetTix {
      * Parses the event data to table
      * @param {*} eventsResponse 
      */
-    parseEventData(eventsResponse) {
-        const VT = this
+    parseEventData(eventsResponse, VT) {
         VT.tblEventData.empty()
         VT.selInventoryEventId.empty()
         if (eventsResponse.eventItems === undefined) {
@@ -228,7 +227,7 @@ class VetTix {
             }
           })
         .done(function(response) {
-            VT.parseEventData(response)
+            VT.parseEventData(response, VT)
         })
         .fail(function(xhr, status, error) {
             const response = xhr.responseJSON
@@ -237,6 +236,7 @@ class VetTix {
         return
     }
 
+    
     /**
      * Log a user in
      */
