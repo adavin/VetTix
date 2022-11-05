@@ -90,10 +90,6 @@ class VetTix {
 
         $.get(VT.apiBasePath + '/state')
         .done(function(response) {
-            if (response.errorCode !== undefined) {
-                alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
-                return
-            }
             for (const state of response.list) {
                 const element = $('<option>')
                 element.val(state.code)
@@ -101,7 +97,10 @@ class VetTix {
                 VT.selEventState.append(element)
             }
         })
-
+        .fail(function(xhr, status, error) {
+            const response = xhr.responseJSON
+            VT.checkAuthFailed(response)
+        })
     }
 
     /**
