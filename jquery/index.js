@@ -1,4 +1,3 @@
-
 class VetTix {
     constructor() {
         this.apiBasePath = 'https://www.vettix.org/uapi'
@@ -21,6 +20,7 @@ class VetTix {
         this.loadEventTypes()
         this.loadStates()
 
+        //Button click methods
         $('#btn-login').on('click', () => this.performLogin())
         $('#btn-clear-session').on('click', () => this.performLogout())
         $('#btn-search').on('click', () => this.performSearch())
@@ -60,6 +60,7 @@ class VetTix {
         const VT = this
         if (VT.selEventType.length !== 1 || VT.currentToken() === null) 
             return false
+
         $.ajax({
             headers: {Authorization: `Bearer ${VT.currentToken()}`},
             url: VT.apiBasePath + '/event-type'})
@@ -73,16 +74,9 @@ class VetTix {
         })
         .fail(function(xhr, status, error) {
             const response = xhr.responseJSON
-            //Check response is valid and token isn't empty
-            if (response.errorCode !== undefined) {
-                if (response.errorCode === 'AUTHENTICATION_FAILED') {
-                    VT.performLogout()
-                    VT.showHideContainers()
-                }
-                alert(`Error Code -> ${response.errorCode} \nError Response -> ${response.message}`)
-                return
-            }
+            VT.checkAuthFailed(response)
         })
+
     }
 
     /**
@@ -93,6 +87,7 @@ class VetTix {
         const VT = this
         if (VT.selEventState.length !== 1) 
             return false
+
         $.get(VT.apiBasePath + '/state')
         .done(function(response) {
             if (response.errorCode !== undefined) {
@@ -106,6 +101,7 @@ class VetTix {
                 VT.selEventState.append(element)
             }
         })
+
     }
 
     /**
@@ -136,9 +132,9 @@ class VetTix {
             .append($('<td>').append(eventItem.startTime))
 
             //populate select -> inventory search -> event ids
-            const element = document.createElement('option')
-            element.value = eventItem.ID
-            element.text = `(${eventItem.ID}) ${eventItem.title}`.replace('&#039;', "'")
+            const element = $('<option>')
+            element.val(eventItem.ID)
+            element.text(`(${eventItem.ID}) ${eventItem.title}`.replace('&#039;', "'"))
             VT.selInventoryEventId.append(element)
         }
     }
@@ -255,7 +251,7 @@ class VetTix {
             //Store token to session
             sessionStorage.setItem('token', response.token)
             VT.showHideContainers()
-            VT.loadEventTypes(VT)
+            VT.loadEventTypes()
         })
         .fail(function(xhr, status, error) {
             const response = xhr.responseJSON
@@ -273,6 +269,10 @@ class VetTix {
         this.showHideContainers()
     }
 
+    /**
+     * Common error handling for responses
+     * @param {}} response 
+     */
     checkAuthFailed(response) {
         if (response.errorCode !== undefined) {
             if (response.errorCode === 'AUTHENTICATION_FAILED') {
