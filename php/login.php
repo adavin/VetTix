@@ -1,7 +1,7 @@
 <?php 
 require_once('includes/vt-class.php');
 $VT = new VetTix();
-if ($VT->current_token() !== NULL) {
+if ($VT->current_token() !== null) {
     header('Location: index.php');
     die();
 }

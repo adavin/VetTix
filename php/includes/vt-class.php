@@ -23,7 +23,7 @@ class VetTix {
      * Return Bearer token from stored session
      * @return string|void
      */
-    function current_token() { 
+    final public function current_token() { 
         return isset($_SESSION['token']) ? $_SESSION['token'] : NULL;
     }
 
@@ -32,7 +32,7 @@ class VetTix {
      *
      * @return void
      */
-    function force_login() {
+    final public function force_login() {
         if ($this->current_token() === NULL) {
             header('Location: login.php');
             die();
@@ -48,7 +48,7 @@ class VetTix {
      * @param string $apikey
      * @return object
      */
-    function login($email, $apikey) {
+    final public function login($email, $apikey) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,API_BASE_PATH.'/user/limited/login');
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -68,7 +68,7 @@ class VetTix {
      * Clear session Bearer token
      * @return void
      */
-    function logout() {
+    final public function logout() {
         $_SESSION['token'] = NULL;
         header('Location: login.php');
         die();
@@ -78,7 +78,7 @@ class VetTix {
      * header.php
      * @return void
      */
-    function get_header() {
+    final public static function get_header() {
         return require_once('includes/header.php');
     }
 
@@ -86,7 +86,7 @@ class VetTix {
      * footer.php
      * @return void
      */
-    function get_footer() {
+    final public static function get_footer() {
         return require_once('includes/footer.php');
     }
 
@@ -95,7 +95,7 @@ class VetTix {
      *
      * @return object
      */
-    function get_event_types() {
+    final public function get_event_types() {
         $this->force_login();
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->current_token()]);
@@ -114,7 +114,7 @@ class VetTix {
      *
      * @return object
      */
-    function get_states() {
+    final public function get_states() {
         $this->force_login();
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, API_BASE_PATH.'/state');
@@ -128,14 +128,14 @@ class VetTix {
      * Search /event API
      *
      * @param string $stateCode
-     * @param string|integer $eventTypeID
+     * @param string|int $eventTypeID
      * @param string $sortBy
      * @param string $eventStatus
-     * @param integer $start
-     * @param integer $count
+     * @param int $start
+     * @param int $count
      * @return object
      */
-    function perform_search($stateCode, $eventTypeID, $sortBy, $eventStatus, $start = 1, $count = 100) {
+    final public function perform_search($stateCode, $eventTypeID, $sortBy, $eventStatus, $start = 1, $count = 100) {
         $this->force_login();
         $params = [
             'start' => $start, 
@@ -161,11 +161,11 @@ class VetTix {
     /**
      * Check inventory for $ticketCount amount of seats
      *
-     * @param string|integer $eventID
-     * @param string|integer $ticketCount
+     * @param string|int $eventID
+     * @param string|int $ticketCount
      * @return string
      */
-    function perform_inventory_search($eventID, $ticketCount = 4) {
+    final public function perform_inventory_search($eventID, $ticketCount = 4) {
         $this->force_login();
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->current_token()]);

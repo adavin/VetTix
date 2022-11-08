@@ -2,19 +2,19 @@
 require_once('includes/vt-class.php');
 $VT = new VetTix();
 $VT->force_login();
-if (isset($_POST['action'])) {
-    switch ($_POST['action']) {
+if ( isset( $_POST['action']) ) {
+    switch ( $_POST['action'] ) {
         case 'logout':
             $VT->logout();
             break;
         case 'search':
-            $event_data = $VT->perform_search($_POST['stateCode'], $_POST['eventTypeID'], $_POST['sortBy'], $_POST['eventStatus']);
+            $event_data = $VT->perform_search( $_POST['stateCode'], $_POST['eventTypeID'], $_POST['sortBy'], $_POST['eventStatus'] );
             break;
         case 'search_inventory':
-            $inventory_response = $VT->perform_inventory_search($_POST['eventID'], $_POST['ticketCount']);
+            $inventory_response = $VT->perform_inventory_search( $_POST['eventID'], $_POST['ticketCount'] );
             break;
         default:
-            die('Unknown action: '.$_POST['action']);
+            die( 'Unknown action: '.$_POST['action'] );
     }
 }
 
@@ -22,7 +22,7 @@ $event_types = $VT->get_event_types();
 $states = $VT->get_states();
 
 // Start content
-$VT->get_header();
+$VT::get_header();
 ?>
   <div class="container-fluid" id="container-data">
     <div class="row">
@@ -41,19 +41,15 @@ $VT->get_header();
                 <input type="hidden" name="action" value="search">
                 <select class="form-select mb-2" aria-label="Event Type" id="select-event-type" name="eventTypeID">
                     <option selected value="0">Any</option>
-<?php 
-    foreach($event_types->list as $event_type) {
-        echo '                    <option value="'.htmlspecialchars($event_type->ID).'">'.htmlspecialchars($event_type->name)."</option>\n";
-    }
-?>
+                <?php foreach( $event_types->list as $event_type ) { ?>
+                    <option value="<?= htmlspecialchars( $event_type->ID ) ?>"><?= htmlspecialchars( $event_type->name ) ?></option>
+                <?php } ?>
                 </select>
                 <select class="form-select mb-2" aria-label="Event State" id="select-event-state" name="stateCode">
                     <option selected value="">Any</option>
-<?php 
-    foreach($states->list as $state) {
-        echo '                    <option value="'.htmlspecialchars($state->code).'">('.htmlspecialchars($state->code).') '.htmlspecialchars($state->name)."</option>\n";
-    }
-?>
+                <?php foreach($states->list as $state) { ?>
+                    <option value="<?= htmlspecialchars( $state->code ) ?>">(<?= htmlspecialchars( $state->code )?>) <?= htmlspecialchars( $state->name ) ?></option>
+                <?php } ?>
                 </select>
                 <select class="form-select mb-2" aria-label="Event Status" id="select-event-status" name="eventStatus">
                     <option value="all">All Events</option>
@@ -85,7 +81,9 @@ $VT->get_header();
                     <button class="btn btn-primary form-control" id="btn-search-inventory" type="submit">Search Inventory</button>
                 </form>
 
-                <?php if (isset($inventory_response)) { echo "<pre>$inventory_response</pre>"; } ?>
+                <?php if (isset($inventory_response)) { ?>
+                    <pre><?= htmlspecialchars($inventory_response) ?></pre>
+                <?php } ?>
             </div>
         </div>
         <div class="col-md-12">
@@ -105,16 +103,18 @@ $VT->get_header();
                     <tbody id="table-event-data">
                     <?php 
                         if (isset($event_data)) {
-                            foreach($event_data->eventItems as $event) {
-                            echo '<tr>';
-                            echo '  <td><img src="'.htmlspecialchars($event->imageURL).'" class="img-thumb"></td>';
-                            echo '  <td>'.htmlspecialchars($event->ID).'</td>';
-                            echo '  <td>'.htmlspecialchars($event->title).'</td>';
-                            echo '  <td>'.htmlspecialchars($event->eventType->name).'</td>';
-                            echo '  <td>'.htmlspecialchars($event->ticketsAvailable).'</td>';
-                            echo '  <td>'.htmlspecialchars($event->startDate).'</td>';
-                            echo '  <td>'.htmlspecialchars($event->startTime).'</td>';
-                            echo "</tr>\n";
+                            foreach( $event_data->eventItems as $event ) {
+                    ?>
+                        <tr>
+                            <td><img src="<?= $event->imageURL ?>" class="img-thumb"></td>
+                            <td><?= $event->ID ?></td>
+                            <td><?=  $event->title ?></td>
+                            <td><?= $event->eventType->name ?></td>
+                            <td><?= $event->ticketsAvailable ?></td>
+                            <td><?= $event->startDate ?></td>
+                            <td><?= $event->startTime ?></td>
+                        </tr>
+                    <?php
                             }
                         }
                     ?>
@@ -125,4 +125,4 @@ $VT->get_header();
     </div>
   </div>
 <?php
-$VT->get_footer();
+$VT::get_footer();
