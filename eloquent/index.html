@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="generator" content="">
+    <title>VetTix.org API Implementation</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <!-- Favicons -->
+    <meta name="theme-color" content="#712cf9">
+    <link href="index.css" rel="stylesheet">
+  </head>
+  <body>
+<main>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Offcanvas navbar large">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">VetTix.org API Implementation</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar2" aria-controls="offcanvasNavbar2">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </nav>
+  <div class="container" id="container-login">
+        <div class="row">
+            <div class="col-md-4 offset-md-4 text-center bg-dark bg-opacity-10 p-3 rounded ">
+                <h3>Login</h3>
+                <input class="form-control mb-4" type="email" id="email" value="" placeholder="Email">
+                <input class="form-control mb-4" type="text" id="apikey" value="" placeholder="API Key">
+                <button class="btn btn-primary" id="btn-login">Login</button>
+            </div>
+        </div>
+  </div>
+  <div class="container-fluid" id="container-data">
+    <div class="row">
+        <div class="col-md-4">
+            <div class=" text-center bg-dark bg-opacity-10 p-3 rounded mb-4">
+                <h3>Logged in</h3>
+                <button class="btn btn-primary" id="btn-clear-session">Clear Session</button>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="text-center bg-dark bg-opacity-10 p-3 rounded mb-4">
+                <select class="form-select mb-2" aria-label="Event Type" id="select-event-type">
+                    <option selected value="0">Any</option>
+                </select>
+                <select class="form-select mb-2" aria-label="Event State" id="select-event-state">
+                    <option selected value="">Any</option>
+                </select>
+                <select class="form-select mb-2" aria-label="Event Status" id="select-event-status">
+                  <option value="all">All Events</option>
+                  <option value="open">Open Events</option>
+                  <option value="lottery">Events in Lottery</option>
+                  <option value="fcfs">First Come – First Serve</option>
+                </select>
+                <select class="form-select mb-2" aria-label="Event Sort" id="select-event-sort">
+                  <option value="dateAscending">Event Date (Soonest)</option>
+                  <option value="dateDescending">Event Date (Farthest)</option>
+                  <option value="ticketsAvailableDescending">Most Tickets Available</option>
+                  <option value="ticketsAvailableAscending">Least Tickets Available</option>
+                  <option value="popularity">Most Popular</option>
+                  <option value="titleAscending">Event Title (A-Z)</option>
+                  <option value="titleDescending">Event Title (Z-A)</option>
+                </select>
+                <button class="btn btn-primary form-control" id="btn-search">Search</button>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bg-dark bg-opacity-10 p-3 rounded mb-4">
+                <span>Event ID</span>
+                <select class="form-select mb-2" aria-label="Event ID" id="sel-inventory-event-id"></select>
+                <span>How many tickets?</span>
+                <input id="inventory-tickets-wanted" class="form-control mb-2" type="number" min="1" max="10" placeholder="Ticket count">
+                <button class="btn btn-primary form-control" id="btn-search-inventory">Search Inventory</button>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-dark table-striped table-bordered table-hover table-responsive" id="table-events">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Image</th>
+                            <th scope="col">Event ID</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Event Type</th>
+                            <th scope="col">Tickets Available</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-event-data">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+  </div>
+</main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <script src="jquery-3.6.1.min.js" defer></script>
+    <script src="index.js" defer></script>
+  </body>
+</html>
