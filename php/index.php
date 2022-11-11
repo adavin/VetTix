@@ -1,4 +1,6 @@
 <?php 
+use \VetTix\VetTix;
+
 require_once('includes/vt-class.php');
 $VT = new VetTix();
 $VT->force_login();
@@ -47,7 +49,7 @@ $VT::get_header();
                 </select>
                 <select class="form-select mb-2" aria-label="Event State" id="select-event-state" name="stateCode">
                     <option selected value="">Any</option>
-                <?php foreach($states->list as $state) { ?>
+                <?php foreach( $states->list as $state ) { ?>
                     <option value="<?= htmlspecialchars( $state->code ) ?>">(<?= htmlspecialchars( $state->code )?>) <?= htmlspecialchars( $state->name ) ?></option>
                 <?php } ?>
                 </select>

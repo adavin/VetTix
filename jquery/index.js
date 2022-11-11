@@ -71,7 +71,8 @@ class VetTix {
 
         $.ajax({
             headers: {Authorization: `Bearer ${VT.currentToken()}`},
-            url: VT.apiBasePath + '/event-type'})
+            url: VT.apiBasePath + '/event-type'
+        })
         .done(function(response) {
             for (const event of response.list) {
                 const element = $('<option>')
@@ -203,8 +204,9 @@ class VetTix {
 
         //Send request
         $.ajax({
-            headers: {Authorization: `Bearer ${VT.currentToken()}`},
-            url: `${VT.apiBasePath}/inventory/${inventoryEventId}`, })
+            headers: { Authorization: `Bearer ${VT.currentToken()}` },
+            url: `${VT.apiBasePath}/inventory/${inventoryEventId}`, 
+        })
         .done(function(response) {
             VT.parseInventoryData(response, ticketsWanted)
         })
@@ -222,7 +224,7 @@ class VetTix {
     performSearch(startNum = 1, count=100) {
         const VT = this
         $.ajax({
-            headers: {Authorization: `Bearer ${VT.currentToken()}`},
+            headers: { Authorization: `Bearer ${VT.currentToken()}` },
             url: VT.apiBasePath + '/event',
             data: {
                 start: startNum,
@@ -232,7 +234,7 @@ class VetTix {
                 sortBy: VT.selEventSort.val(),
                 eventStatus: VT.selEventStatus.val()
             }
-          })
+        })
         .done(function(response) {
             VT.parseEventData(response)
         })
