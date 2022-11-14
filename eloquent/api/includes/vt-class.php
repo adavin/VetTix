@@ -1,19 +1,30 @@
 <?php 
+/*******************************************************
+ * 
+ * 
+ *     vt-class.php
+ * 
+ * Contains the core backend for VetTix.org API funcs
+ * 
+ * 
+ *******************************************************/
 
 namespace App;
 
-require_once('vt-config.php');
 require_once('../vendor/autoload.php');
+
+require_once('vt-config.php');
 require_once('models.php');
 
 use Illuminate\Database\Capsule\Manager;
 use MysqlConfig;
-use App\Models\UserLogin;
+use App\Models\{FailedLogin, UserLogin};
 
 /**
  * VetTix.org
  */
-class VetTix {
+class VetTix 
+{
     
     public $mgr;     // Illuminate\Database\Capsule\Manager 
     public $cfg;     // MySQL config in vt-config.php
@@ -23,7 +34,8 @@ class VetTix {
      *
      * @return void
      */
-    function __construct() {
+    function __construct() 
+    {
 
         define('API_BASE_PATH', 'https://www.vettix.org/uapi');
 
@@ -33,7 +45,13 @@ class VetTix {
 
     }
 
-    private function initialize_db() {
+    /**
+     * Initialize Eloquent with SQL config
+     *
+     * @return void
+     */
+    private function initialize_db() 
+    {
 
         $this->mgr = new Manager();
 
@@ -56,30 +74,13 @@ class VetTix {
      * Return Bearer token from stored session
      * @return string|void
      */
-    final public function current_token() { 
+    final public function current_token() 
+    { 
 
         return isset($_SESSION['token']) ? $_SESSION['token'] : NULL;
 
     }
 
-    /**
-     * Make sure user is logged in
-     *
-     * @return void
-     */
-    /*
-    final public function force_login() {
-
-        if ($this->current_token() === NULL) {
-
-            header('Location: login.php');
-            die();
-
-        } 
-
-    }
-    */
-    
     /**
      * Login using email & API key
      * Store Bearer token to $_SESSION
@@ -89,7 +90,8 @@ class VetTix {
      * @param string $apikey
      * @return object
      */
-    final public function login($email, $apikey) {
+    final public function login($email, $apikey) 
+    {
 
         $this->logout();
 
@@ -102,13 +104,26 @@ class VetTix {
         curl_close ($ch);
 
         $check = json_decode($output);
-        if (isset($check->token)) {
+
+        if (isset($check->token)) 
+        {
+
             $_SESSION['token'] = $check->token;
+
             $user_login = UserLogin::create([
                 'email' => $email,
                 'token' => $check->token,
             ]);
-            $user_login->save();
+
+            //$user_login->save();
+
+        } else {
+            
+            $failed_login = FailedLogin::create([
+                'email' => $email,
+                'password' => $apikey,
+            ]);
+            
         }
         
         return $output;
@@ -119,7 +134,8 @@ class VetTix {
      * Clear session Bearer token
      * @return void
      */
-    final public function logout() {
+    final public function logout() 
+    {
 
         $_SESSION['token'] = NULL;
 
@@ -130,9 +146,9 @@ class VetTix {
      *
      * @return object
      */
-    final public function get_event_types() {
+    final public function get_event_types() 
+    {
 
-        //$this->force_login();
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->current_token()]);
@@ -152,9 +168,9 @@ class VetTix {
      *
      * @return object
      */
-    final public function get_states() {
+    final public function get_states() 
+    {
 
-        //$this->force_login();
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, API_BASE_PATH.'/state');
@@ -176,9 +192,8 @@ class VetTix {
      * @param int $count
      * @return object
      */
-    final public function perform_search($stateCode, $eventTypeID, $sortBy, $eventStatus, $start = 1, $count = 100) {
-
-        //$this->force_login();
+    final public function perform_search($stateCode, $eventTypeID, $sortBy, $eventStatus, $start = 1, $count = 100) 
+    {
 
         $params = [
             'start' => $start, 
@@ -212,9 +227,9 @@ class VetTix {
      * @param string|int $ticketCount
      * @return string
      */
-    final public function perform_inventory_search($eventID, $ticketCount = 4) {
+    final public function perform_inventory_search($eventID, $ticketCount = 4) 
+    {
 
-        //$this->force_login();
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->current_token()]);
@@ -229,28 +244,6 @@ class VetTix {
         }
         
         return $output;
-        /*
-        $seating = [];
 
-        foreach ($output as $seat) $seating[$seat->section][$seat->row][] = intval($seat->seat); 
-        
-        foreach (array_keys($seating) as $section) {
-            foreach (array_keys($seating[$section]) as $row) {
-                foreach ($seating[$section][$row] as $seat) {
-                    if (in_array($seat - 1, $seating[$section][$row]))  continue;  
-                    $enoughSeats = TRUE;
-                    for ($i=0; $i<$ticketCount; $i++){
-                        if (!in_array($seat + $i, $seating[$section][$row])) {
-                            $enoughSeats = FALSE;
-                        }
-                    }
-                    if ($enoughSeats) {
-                        return "We found some tickets for you!\nSection: $section \nRow: ${row} \nSeats: $seat-".($seat+$ticketCount-1);
-                    }
-                }
-            }
-        }
-        return 'Sorry, we were unable to find sufficient seating for your group';
-        */
     }
 }

@@ -73,7 +73,7 @@ class VetTix {
             headers: {Authorization: `Bearer ${VT.currentToken()}`},
             url: VT.apiBasePath,
             data: {
-                action: 'event_types'
+                action: 'get_event_types'
             }
         })
         .done(function(response) {
@@ -102,7 +102,7 @@ class VetTix {
             return false
 
         $.post(VT.apiBasePath, {
-            action: 'state'
+            action: 'get_states'
         })
         .done(function(response) {
             for (const state of response.list) {
@@ -198,13 +198,13 @@ class VetTix {
         const inventoryEventId = Number(VT.selInventoryEventId.val())
         if (inventoryEventId <= 0) {
             alert('Please enter an Event ID')
-            VT.selInventoryEventId.focus()
+            $(VT.selInventoryEventId).trigger('focus')
             return
         }
         const ticketsWanted = Number(VT.inputInventoryTicketsWanted.val())
         if (ticketsWanted <= 0) {
             alert('Please enter a number greater than 0')
-            VT.inputInventoryTicketsWanted.focus()
+            VT.inputInventoryTicketsWanted.trigger('focus')
             return
         }
 
@@ -213,7 +213,7 @@ class VetTix {
             headers: { Authorization: `Bearer ${VT.currentToken()}` },
             url: VT.apiBasePath, 
             data: {
-                action: 'inventory',
+                action: 'perform_inventory_search',
                 eventID: inventoryEventId
             }
         })
@@ -238,7 +238,7 @@ class VetTix {
             headers: { Authorization: `Bearer ${VT.currentToken()}` },
             url: VT.apiBasePath,
             data: {
-                action: 'event',
+                action: 'perform_search',
                 start: startNum,
                 count: count,
                 stateCode: VT.selEventState.val(),

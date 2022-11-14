@@ -1,4 +1,17 @@
 <?php 
+/*******************************************************
+ * 
+ * 
+ *     migrate.php
+ * 
+ * Custom migration file for creating database schema
+ * 
+ * Usage:
+ *      php migrate.php up      <- creates sql schema
+ *      php migrate.php down    <- deletes sql schema
+ * 
+ * 
+ *******************************************************/
 
 require_once('vt-class.php');
 
@@ -6,16 +19,15 @@ use App\VetTix;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-$vt = new VetTix();
-
-class CreateUserLogin extends Migration
+class MigrationActions extends Migration
 {
     protected $vt;
 
     /**
      * 
      */
-    public function __construct($vt){
+    public function __construct($vt)
+    {
         $this->vt = $vt;
     }
 
@@ -35,6 +47,15 @@ class CreateUserLogin extends Migration
 
         });
 
+        $this->vt->mgr::schema()->create('failed_logins', function (Blueprint $table) {
+
+            $table->id();
+            $table->string('email', 100);
+            $table->string('password', 255);
+            $table->timestamps();
+
+        });
+
     }
 
     /**
@@ -47,15 +68,19 @@ class CreateUserLogin extends Migration
 
         $this->vt->mgr::schema()->dropIfExists('user_logins');
 
+        $this->vt->mgr::schema()->dropIfExists('failed_logins');
+
     }
 
     /**
-     * return default response to user
+     *  Invalid usage 
+     *  return default response to user
      *
      * @param [type] $a
      * @return void
      */
-    public function no_action($a) {
+    public function no_action($a) 
+    {
     
         header('Content-Type: application/json');
         $result = json_encode(['result' => 'No action specified', 'argv' => $a]);
@@ -63,26 +88,32 @@ class CreateUserLogin extends Migration
     }
 }
 
-$cul = new CreateUserLogin($vt);
+/**
+ * 
+ */
+$vt = new VetTix();
+
+$ma = new MigrationActions($vt);
 
 
 if (!isset($argv[1]))
     $cul->no_action($argv);
 
-switch ($argv[1]) {
+switch ($argv[1]) 
+{
 
     case 'up':
-        $cul->up();
-        $response = 'Migrate up.';
+        $ma->up();
+        $response = 'Migrate up';
         break;
 
     case 'down':
-        $cul->down();
+        $ma->down();
         $response = 'Migrate down';
         break;
 
     default:
-        $cul->no_action($argv);
+        $ma->no_action($argv);
         break;
     
 }
